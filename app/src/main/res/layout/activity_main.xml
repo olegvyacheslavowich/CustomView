@@ -6,10 +6,16 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
+    <ru.simaland.customview.StatsView
+        android:id="@+id/statsView"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        app:textSize="50sp"
+        app:lineWidth="15dp"
+        app:color1="#123456"
+        app:color2="#345667"
+        app:color3="#678908"
+        app:color4="#876543"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
