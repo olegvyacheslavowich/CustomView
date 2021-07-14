@@ -1,5 +1,7 @@
 package ru.simaland.customview
 
+import android.animation.Animator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -7,6 +9,8 @@ import android.graphics.PointF
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.BounceInterpolator
 import androidx.core.content.withStyledAttributes
 import kotlin.random.Random
 
@@ -23,6 +27,10 @@ class StatsView constructor(context: Context, attributes: AttributeSet? = null) 
         strokeJoin = Paint.Join.MITER
     }
 
+    private var progress = 0F
+    private var animator: Animator? = null
+
+
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
         textAlign = Paint.Align.CENTER
@@ -31,8 +39,29 @@ class StatsView constructor(context: Context, attributes: AttributeSet? = null) 
     var data: List<Float> = emptyList()
         set(value) {
             field = value
-            invalidate()
+            update()
         }
+
+    private fun update() {
+
+        animator?.let {
+            it.removeAllListeners()
+            it.cancel()
+        }
+        progress = 0F
+
+        animator = ValueAnimator.ofFloat(0F, 1F).apply {
+            addUpdateListener {
+                progress = it.animatedValue as Float
+                invalidate()
+            }
+            duration = 2_000
+            interpolator = AccelerateInterpolator()
+            start()
+        }
+
+    }
+
     private var oval = RectF(0F, 0F, 0F, 0F)
 
     init {
@@ -70,22 +99,17 @@ class StatsView constructor(context: Context, attributes: AttributeSet? = null) 
             }
         }
 
-        var startAngle = -90F
+        var startAngle = 0F
         var firstColor: Int? = null
         dataInPercent.forEach {
             val angle = it * 360F
-            paint.color = Random.nextInt(0xFF000000.toInt(), 0xFFFFFFFF.toInt())
+            paint.color = 0xFF005678.toInt()
             if (firstColor == null) {
                 firstColor = paint.color
             }
-            canvas.drawArc(oval, startAngle, angle, false, paint)
+            canvas.drawArc(oval, (startAngle) * progress, angle, false, paint)
             startAngle += angle
         }
-
-        startAngle = -90F
-        paint.color = firstColor ?: 0xFF000000.toInt()
-        canvas.drawArc(oval, startAngle, 10F, false, paint)
-
 
         canvas.drawText(
             "%.2f%%".format(dataInPercent.sum() * 100),
